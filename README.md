@@ -153,7 +153,7 @@ Use with `-h` to see command line flags.
 For example
 
 ```
-curl -v http://127.0.0.1/news/1
+curl -v http://127.0.0.1:3000/news/1
 ```
 
 # Licensing
