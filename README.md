@@ -95,13 +95,30 @@ if the names are as above.
 
 ### CockroachDB
 
-Start CockroachDB server, or make sure it's running.
+Start CockroachDB server
 
 ```
 cockroach start --insecure --listen-addr=localhost
 ```
 
-//
+Start NATS server
+
+```
+nats-server
+```
+
+Start stoarge service
+```
+go run github.com/logrusorgru/news_micro_storage_system/cmd/storage
+```
+
+Start query_client REST servic
+
+```
+go run github.com/logrusorgru/news_micro_storage_system/cmd/query_client
+```
+
+Use with `-h` to see command line flags.
 
 
 # Licensing
