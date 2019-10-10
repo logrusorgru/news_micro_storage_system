@@ -3,9 +3,11 @@ News Micro Storage System
 
 [![GoDoc](https://godoc.org/github.com/logrusorgru/news_micro_storage_system?status.svg)](https://godoc.org/github.com/logrusorgru/news_micro_storage_system)
 [![WTFPL License](https://img.shields.io/badge/license-wtfpl-blue.svg)](http://www.wtfpl.net/about/)
+<!--
 [![Build Status](https://travis-ci.org/logrusorgru/news_micro_storage_system.svg)](https://travis-ci.org/logrusorgru/news_micro_storage_system)
 [![Coverage Status](https://coveralls.io/repos/logrusorgru/news_micro_storage_system/badge.svg?branch=master)](https://coveralls.io/r/logrusorgru/news_micro_storage_system?branch=master)
 [![GoReportCard](https://goreportcard.com/badge/logrusorgru/news_micro_storage_system)](https://goreportcard.com/report/logrusorgru/news_micro_storage_system)
+-->
 
 The _news_micro_storage_system_ is an application to obtain and store news
 based on cockroackdb and uses bicroservice architecture.
