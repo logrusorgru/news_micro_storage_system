@@ -28,4 +28,4 @@ cover.html
 
 
 /cmd/storage/storage
-/cmd/queue_client/queue_client
+/cmd/query_client/query_client

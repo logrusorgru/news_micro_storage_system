@@ -25,6 +25,29 @@
 
 package main
 
+import (
+	"flag"
+	"log"
+	"os"
+
+	"github.com/logrusorgru/news_micro_storage_system/queryClient"
+)
+
 func main() {
-	//
+
+	log.SetOutput(os.Stdout)
+
+	conf := queryClient.NewConfig()
+	conf.FromFlags(flag.CommandLine, "")
+	flag.Parse()
+
+	srv, err := queryClient.NewServer(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer srv.Close()
+
+	if err := srv.Server.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }
