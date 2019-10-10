@@ -138,7 +138,7 @@ Start stoarge service
 go run github.com/logrusorgru/news_micro_storage_system/cmd/storage
 ```
 
-Start query_client REST servic
+Start query_client REST service
 
 ```
 go run github.com/logrusorgru/news_micro_storage_system/cmd/query_client
