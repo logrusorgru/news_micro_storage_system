@@ -1,0 +1,21 @@
+syntax="proto3";
+
+package msg;
+
+// NewsItem identifier for request.
+message ID {
+	int64 ID = 1;
+}
+
+// NewsItem itself.
+message NewsItem {
+	int64   ID     = 1;
+	string  Header = 2;
+	string  Data   = 3;
+}
+
+// Response for NewsItem request with error.
+message Response {
+	NewsItem  item  = 1;
+	string    error = 2;
+}
