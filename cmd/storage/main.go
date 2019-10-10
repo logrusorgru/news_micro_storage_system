@@ -25,6 +25,51 @@
 
 package main
 
+import (
+	"flag"
+	"log"
+	"os"
+	"os/signal"
+
+	"github.com/logrusorgru/news_micro_storage_system/storage"
+)
+
+func waitSigInt(ctx *storage.Context) {
+
+	sigs := make(chan os.Signal, 2)
+	signal.Notify(sigs, os.Interrupt)
+
+	log.Print("got signal %s, exiting...", <-sigs)
+	ctx.Cancel()
+}
+
 func main() {
-	//
+
+	log.SetOutput(os.Stdout)
+
+	conf := storage.NewConfig()
+	conf.FromFlags(flag.CommandLine, "")
+	flag.Parse()
+
+	ctx := storage.NewContext()
+
+	defer func() {
+		if err := ctx.Errs(); err != nil {
+			log.Fatal(err) // for the exit code
+		}
+	}()
+
+	db, err := storage.NewDB(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	qq, err := storage.NewQQ(ctx, conf, db)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer qq.Close()
+
+	waitSigInt(ctx)
 }
