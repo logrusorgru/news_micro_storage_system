@@ -104,12 +104,18 @@ func (c *Config) FromFlags(fset *flag.FlagSet, prefix string) {
 		"NATS subject's name")
 }
 
+// A Server represents HTTP server
 type Server struct {
 	Conf   *Config     // reference to Config
 	Server http.Server // HTTP Server
 	Conn   *nats.Conn  // NATS connection
 }
 
+// NewServer connects to NATS server and returns HTTP server.
+// Start it using
+//
+//    srv.Server.ListenAndServe()
+//
 func NewServer(conf *Config) (srv *Server, err error) {
 	srv = new(Server)
 	srv.Conf = conf
@@ -175,6 +181,7 @@ func (s *Server) getNews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// found
+	w.Header().Add("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(mrsp.Item); err != nil {
 		log.Print("[HTTP] writing response: ", err)
 	}

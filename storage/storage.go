@@ -72,7 +72,7 @@ func NewContext() (c *Context) {
 // Terminate context with given error.
 func (c *Context) Terminate(err error) {
 	if err == context.Canceled {
-		c.Err <- nil // no errors, a legal cancel
+		c.Err <- nil // no errors, a legal cancel, already canceled
 		return
 	}
 	c.Err <- err

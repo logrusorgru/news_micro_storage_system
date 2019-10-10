@@ -99,6 +99,34 @@ Start CockroachDB server
 cockroach start --insecure --listen-addr=localhost
 ```
 
+Craete user and database
+
+```
+cockroach sql --insecure
+```
+
+```
+CREATE DATABASE news_items;
+CREATE USER news_items;
+GRANT ALL ON DATABASE news_items TO news_items;
+```
+
+optioanlly, create and fill table
+
+```
+CREAT TABLE IF NOT EXISTS news_items (
+  id   SERIAL PRIMARY KEY,
+  head VARCHAR(255),
+  data TEXT
+);
+
+INSERT INTO news_items (header, data) VALUES
+  ('head-1', 'data-1'),
+  ('head-2', 'data-2'),
+  ('head-3', 'data-3')
+RETURNING id;
+```
+
 Start NATS server
 
 ```

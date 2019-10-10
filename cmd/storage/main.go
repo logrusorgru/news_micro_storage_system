@@ -65,6 +65,11 @@ func main() {
 	}
 	defer db.Close()
 
+	if err := db.Init(ctx); err != nil {
+		ctx.Terminate(err)
+		return
+	}
+
 	qq, err := storage.NewQQ(ctx, conf, db)
 	if err != nil {
 		log.Fatal(err)
