@@ -12,8 +12,8 @@ News Micro Storage System
 The _news_micro_storage_system_ is microservices to obtain news from
 CockroachDB. The news schema is
 
-```
-id   int64
+```sql
+id   serial
 head varchar(255)
 data text
 ```
@@ -47,7 +47,7 @@ cockroach sql --insecure
 
 And create test database and user.
 
-```
+```sql
 CREATE DATABASE test_news_items;
 CREATE USER test_news_items;
 GRANT ALL ON DATABASE test_news_items TO test_news_items;
@@ -105,7 +105,7 @@ Craete user and database
 cockroach sql --insecure
 ```
 
-```
+```sql
 CREATE DATABASE news_items;
 CREATE USER news_items;
 GRANT ALL ON DATABASE news_items TO news_items;
@@ -113,7 +113,7 @@ GRANT ALL ON DATABASE news_items TO news_items;
 
 optioanlly, create and fill table
 
-```
+```sql
 CREAT TABLE IF NOT EXISTS news_items (
   id   SERIAL PRIMARY KEY,
   head VARCHAR(255),
