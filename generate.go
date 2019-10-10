@@ -25,4 +25,4 @@
 
 package news_micro_storage_system
 
-//go:generate protoc --go_out=:. ./msg/*.proto
+//go:generate protoc --go_out=:. ./msg/msg.proto

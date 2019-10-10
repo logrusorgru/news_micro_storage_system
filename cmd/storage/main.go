@@ -39,7 +39,7 @@ func waitSigInt(ctx *storage.Context) {
 	sigs := make(chan os.Signal, 2)
 	signal.Notify(sigs, os.Interrupt)
 
-	log.Print("got signal %s, exiting...", <-sigs)
+	log.Printf("got signal %s, exiting...", <-sigs)
 	ctx.Cancel()
 }
 

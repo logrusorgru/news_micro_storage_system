@@ -9,46 +9,31 @@ News Micro Storage System
 [![GoReportCard](https://goreportcard.com/badge/logrusorgru/news_micro_storage_system)](https://goreportcard.com/report/logrusorgru/news_micro_storage_system)
 -->
 
-The _news_micro_storage_system_ is an application to obtain and store news
-based on cockroackdb and uses bicroservice architecture.
-
-# Representation
+The _news_micro_storage_system_ is microservices to obtain news from
+CockroachDB. The news schema is
 
 ```
-blah-blah
+id   int64
+head varchar(255)
+data text
 ```
 
 # Get
 
-#### Get
-
 ```
 go get -u github.com/logrusorgru/news_micro_storage_system
+cd $GOPATH/github.com/logrusorgru/news_micro_storage_system
 ```
-
-#### Generate
 
 Regenerate protbuf messages if you want
 
-###### Prepare
-
-
 ```
-go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+go generate
 ```
 
-###### Generate
+### Test
 
-(TODO: go generate)
-
-```
-cd $GOPATH/github.com/logrusorgru/news_micro_storage_system
-protoc --go_out=:. ./msg/*.proto
-```
-
-#### Test
-
-Prepare CockroachDB for tests. Feel free to choose your DB address and port.
+Prepare CockroachDB for tests.
 
 ```
 cockroach start --insecure --listen-addr=localhost
@@ -60,7 +45,7 @@ Open Cockroach SQL console
 cockroach sql --insecure
 ```
 
-And create test database and user. Feel free to choose you DB name/user.
+And create test database and user.
 
 ```
 CREATE DATABASE test_news_items;
@@ -77,7 +62,16 @@ nats-server
 Then test
 
 ```
-go test -cover -race github.com/logrusorgru/news_micro_storage_system/... \
+go test -cover -race ./...
+```
+
+To test it with own DB name, DB user name, etc use commandline flags and
+test `storage/` and `queryClient/` packages separately. For example
+
+
+```
+cd storage/
+go test -cover -race \
     -test-db-addr=localhost            \
     -test-db-port=26257                \
     -test-db-name=test_news_items      \
@@ -85,13 +79,15 @@ go test -cover -race github.com/logrusorgru/news_micro_storage_system/... \
     -test-nats-subject=test_news_items
 ```
 
-or just
+and
 
 ```
-go test -cover -race github.com/logrusorgru/news_micro_storage_system/...
+cd queryClient/
+go test -cover -race \
+    -test-addr=127.0.0.1:3000          \
+    -test-timeout=500ms                \
+    -test-nats-subject=test_news_items
 ```
-
-if the names are as above.
 
 # Start
 
@@ -122,6 +118,15 @@ go run github.com/logrusorgru/news_micro_storage_system/cmd/query_client
 
 Use with `-h` to see command line flags.
 
+
+# Query
+
+
+For example
+
+```
+curl -v http://127.0.0.1/news/1
+```
 
 # Licensing
 
