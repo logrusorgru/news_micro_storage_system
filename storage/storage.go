@@ -123,37 +123,44 @@ func NewConfig() (c *Config) {
 }
 
 // FromFlags obtains config values from command-line flags.
-// You should call flag.Parse after this method.
-func (c *Config) FromFlags() {
+// You should call flag.Parse after this method. Use
+//
+//     conf.FromFlags(flag.CommandLine, "")
+//
+// to use default (root) flag set.
+//
+// The prefix argument used to prefix all the flags with the
+// given prefix. Use "prefix-" or something like that.
+func (c *Config) FromFlags(fset *flag.FlagSet, prefix string) {
 	flag.StringVar(&c.DBAddr,
-		"db-addr",
+		prefix+"db-addr",
 		c.DBAddr,
 		"cockroachdb server's address")
 	flag.IntVar(&c.DBPort,
-		"db-port",
+		prefix+"db-port",
 		c.DBPort,
 		"cockroachdb server's port")
 	flag.StringVar(&c.DBName,
-		"db-name",
+		prefix+"db-name",
 		c.DBName,
 		"database name")
 	flag.StringVar(&c.DBUser,
-		"db-user",
+		prefix+"db-user",
 		c.DBUser,
 		"database user name")
 	flag.StringVar(&c.NATSURL,
-		"nats-url",
+		prefix+"nats-url",
 		c.NATSURL,
 		"NATS server's url")
 	flag.StringVar(&c.Subject,
-		"nats-subject",
+		prefix+"nats-subject",
 		c.Subject,
 		"NATS subject's name")
 }
 
 // OpenDBURL based on values of the Config.
 func (c *Config) OpenDBURL() string {
-	return fmt.Sprintf("postgresql://%s@%s:%d/%d?sslmode=disable",
+	return fmt.Sprintf("postgresql://%s@%s:%d/%s?sslmode=disable",
 		c.DBUser, c.DBAddr, c.DBPort, c.DBName)
 }
 
@@ -173,8 +180,8 @@ func NewDB(conf *Config) (db *DB, err error) {
 
 // Init database creating table if it doesn't exist
 func (db *DB) Init(ctx *Context) (err error) {
-	const createTable = `CREATE TABLE IF NOT EXIST ` + tableName + ` (
-		id     INT PRIMARY KEY,
+	const createTable = `CREATE TABLE IF NOT EXISTS ` + tableName + ` (
+		id     SERIAL PRIMARY KEY,
 		header VARCHAR(255),
 		data   TEXT
 	)`
@@ -192,7 +199,7 @@ func (db *DB) Select(
 	err error,
 ) {
 
-	const selectNewsItem = `SELECT * FROM ` + tableName + ` WHER id = $1`
+	const selectNewsItem = `SELECT * FROM ` + tableName + ` WHERE id = $1`
 
 	ni = new(msg.NewsItem)
 	err = db.DB.QueryRowContext(ctx.Ctx, selectNewsItem, id).Scan(
@@ -210,7 +217,6 @@ func (db *DB) Close() error {
 
 // The QQ represents NATS conenction and processor
 type QQ struct {
-	DB   *DB                // reference
 	Conn *nats.Conn         // connection
 	Subs *nats.Subscription // subscription
 }
@@ -221,10 +227,9 @@ func NewQQ(ctx *Context, conf *Config, db *DB) (qq *QQ, err error) {
 	if qq.Conn, err = nats.Connect(conf.NATSURL); err != nil {
 		return nil, fmt.Errorf("conencting NATS: %v", err)
 	}
-	qq.Subs, err = qq.Conn.QueueSubscribe(
-		"news-items",
+	qq.Subs, err = qq.Conn.Subscribe(
 		conf.Subject, // strings.Replace(conf.Subject, "_", ".", -1)
-		qq.handler(ctx),
+		qq.handler(ctx, db),
 	)
 	if err != nil {
 		qq.Conn.Close()
@@ -234,7 +239,7 @@ func NewQQ(ctx *Context, conf *Config, db *DB) (qq *QQ, err error) {
 }
 
 // handler for requests.
-func (qq *QQ) handler(ctx *Context) func(req *nats.Msg) {
+func (qq *QQ) handler(ctx *Context, db *DB) func(req *nats.Msg) {
 	return func(req *nats.Msg) {
 		var (
 			id  msg.ID
@@ -246,7 +251,7 @@ func (qq *QQ) handler(ctx *Context) func(req *nats.Msg) {
 			return
 		}
 		var ni *msg.NewsItem
-		ni, err = qq.DB.Select(ctx, id.ID)
+		ni, err = db.Select(ctx, id.ID)
 		var rsp msg.Response
 		rsp.Item = ni
 		if err != nil {
