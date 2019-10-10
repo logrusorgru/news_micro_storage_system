@@ -130,6 +130,7 @@ func (s *Server) setupRoutes() {
 	r.Use(middleware.Logger)                  // request logs
 	r.Use(middleware.Timeout(s.Conf.Timeout)) // request timeout
 	r.Get("/news/{id}", s.getNews)
+	s.Server.Handler = r
 }
 
 // GET /news/{id}
@@ -181,6 +182,7 @@ func (s *Server) getNews(w http.ResponseWriter, r *http.Request) {
 
 // Close the Server.
 func (s *Server) Close() (err error) {
+	err = s.Server.Close()
 	s.Conn.Close()
-	return s.Server.Close()
+	return
 }
